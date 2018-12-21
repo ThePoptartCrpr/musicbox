@@ -1,5 +1,3 @@
-
-
 function MusicBoxMain() {
   this.manager = new MusicBoxSongManager(this);
   this.gui = new MusicBoxOverlayGui(this);

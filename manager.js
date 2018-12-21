@@ -21,7 +21,18 @@ function MusicBoxSongManager(musicbox) {
     }
 
     // Cleanup deleted songs
+    var assetsDir = new java.io.File('config/ChatTriggers/modules/musicbox/assets');
+    if (assetsDir.exists()) {
+      var assetSongs = assetsDir.listFiles();
+      for (var i = 0; i < assetSongs.length; i++) {
+        var song = assetSongs[i];
 
+        var inPlaylist = false;
+        this.allSongs.getSongs().forEach(function(song) {
+          if (song.getName())
+        })
+      }
+    }
   }
 
   this.loadPlaylist = function(path) {
@@ -71,12 +82,16 @@ function MusicBoxSongManager(musicbox) {
     this.name = name;
     this.songs = [];
 
+    this.addSong = function(songName) {
+      this.songs.push(new Song(songName));
+    }
+
     this.getName = function() {
       return this.name;
     }
 
-    this.addSong = function(songName) {
-      this.songs.push(new Song(songName));
+    this.getSongs = function() {
+      return this.songs;
     }
   }
 
