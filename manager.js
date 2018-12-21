@@ -1,9 +1,16 @@
 function MusicBoxSongManager(musicbox) {
-  this.gui = musicbox.gui;
+  this.musicbox = musicbox;
   this.playlists = [];
   this.allSongs = new Playlist('All Songs');
 
+  this.errors = {
+    invalid_filetype: {
+      files: [],
+    }
+  }
+
   this.loadSongs = function() {
+    print('loading songs!');
     var libraryDir = new java.io.File('config/musicbox');
     if (!(libraryDir.exists()) || !(libraryDir.isDirectory())) {
       libraryDir.mkdir();
@@ -29,7 +36,6 @@ function MusicBoxSongManager(musicbox) {
 
         var inPlaylist = false;
         this.allSongs.getSongs().forEach(function(song) {
-          print(song.getTitle())
           if (!inPlaylist && songName === song.getTitle()) {
             inPlaylist = true;
           }
@@ -38,6 +44,9 @@ function MusicBoxSongManager(musicbox) {
         if (!inPlaylist) currentSong.delete();
       }
     }
+
+    // Make All Songs a usable playlist
+    this.playlists.push(this.allSongs);
   }
 
   this.loadPlaylist = function(path) {
@@ -56,7 +65,7 @@ function MusicBoxSongManager(musicbox) {
 
     if (song.exists()) {
       // .ogg -> mp3 conversion not yet supported, ignore file
-      if (getFileExtension(song) != '.ogg') return ChatLib.chat('&e[musicbox] &7> &cSorry, only &l.ogg &r&cfiles are supported at this time.\n   &7' + song.getName() + ' was not loaded.');
+      if (getFileExtension(song) != '.ogg') return this.errors.invalid_filetype.files.push(song.getName());
 
       // Copy file into assets if not already
       var targetFile = new java.io.File('config/ChatTriggers/modules/musicbox/assets/' + song.getName());
@@ -79,6 +88,17 @@ function MusicBoxSongManager(musicbox) {
         playlist.addSong(getVisibleFileName(song));
       }
       this.allSongs.addSong(getVisibleFileName(song));
+    }
+  }
+
+  this.output = function() {
+    print('yeehaw outputting');
+    if (this.errors.invalid_filetype.files.length != 0) {
+      ChatLib.chat('&e[musicbox] &7> &cSorry, only &l.ogg &r&cfiles are supported at this time.');
+      this.errors.invalid_filetype.files.forEach(function(filename) {
+        ChatLib.chat('   &7' + filename + ' was not loaded.');
+      });
+      // this.errors.invalid_filetype.files = [];
     }
   }
 
