@@ -5,7 +5,6 @@ function MusicBoxSongManager(musicbox) {
 
   this.loadSongs = function() {
     var libraryDir = new java.io.File('config/musicbox');
-    // print(libraryDir.isDirectory());
     if (!(libraryDir.exists()) || !(libraryDir.isDirectory())) {
       libraryDir.mkdir();
 
@@ -25,12 +24,18 @@ function MusicBoxSongManager(musicbox) {
     if (assetsDir.exists()) {
       var assetSongs = assetsDir.listFiles();
       for (var i = 0; i < assetSongs.length; i++) {
-        var song = assetSongs[i];
+        var currentSong = assetSongs[i];
+        var songName = getVisibleFileName(currentSong);
 
         var inPlaylist = false;
         this.allSongs.getSongs().forEach(function(song) {
-          if (song.getName())
-        })
+          print(song.getTitle())
+          if (!inPlaylist && songName === song.getTitle()) {
+            inPlaylist = true;
+          }
+        });
+
+        if (!inPlaylist) currentSong.delete();
       }
     }
   }
@@ -50,7 +55,6 @@ function MusicBoxSongManager(musicbox) {
     var song = new java.io.File(path);
 
     if (song.exists()) {
-
       // .ogg -> mp3 conversion not yet supported, ignore file
       if (getFileExtension(song) != '.ogg') return ChatLib.chat('&e[musicbox] &7> &cSorry, only &l.ogg &r&cfiles are supported at this time.\n   &7' + song.getName() + ' was not loaded.');
 
@@ -72,9 +76,9 @@ function MusicBoxSongManager(musicbox) {
           playlist = new Playlist(playlistName);
           this.playlists.push(playlist);
         }
-        playlist.addSong(song.getName());
+        playlist.addSong(getVisibleFileName(song));
       }
-      this.allSongs.addSong(song.getName());
+      this.allSongs.addSong(getVisibleFileName(song));
     }
   }
 
